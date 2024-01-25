@@ -1,0 +1,30 @@
+- name: Enable unattended-upgrades
+  hosts: all
+  become: true
+  tasks:
+    - name: Install unattended-upgrades
+      ansible.builtin.apt:
+        update_cache: true
+        name: unattended-upgrades
+
+    - name: Create /etc/apt/apt.conf.d/20auto-upgrades
+      ansible.builtin.copy:
+        src: files/unattended-upgrades/20auto-upgrades
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        owner: root
+        group: root
+        mode: '644'
+
+    - name: Create /etc/apt/apt.conf.d/50unattended-upgrades
+      ansible.builtin.copy:
+        src: files/unattended-upgrades/50unattended-upgrades
+        dest: /etc/apt/apt.conf.d/50unattended-upgrades
+        owner: root
+        group: root
+        mode: '644'
+
+    - name: Enable unattended-upgrades service
+      ansible.builtin.systemd_service:
+        name: unattended-upgrades
+        enabled: true
+        state: started

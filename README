@@ -1,0 +1,5 @@
+This is a collection of Ansible playbooks for Debian 12 machines.
+
+- Enable automatic package updates (unattended-upgrades):
+
+  $ ansible-playbook playbooks/unattended-upgrades.yml -K
