@@ -3,3 +3,13 @@ This is a collection of Ansible playbooks for Debian 12 machines.
 - Enable automatic package updates (unattended-upgrades):
 
   $ ansible-playbook playbooks/unattended-upgrades.yml -K
+
+- Configure OpenSSH daemon:
+
+  $ ansible-playbook playbooks/openssh-daemon.yml -K
+
+  This playbook hardens the OpenSSH daemon by removing certain Diffie-Hellman
+  moduli, re-generating an EdDSA host key and configuring sshd to only accept
+  public key authentication for certain non-root users. Additionally, only
+  select modern and secure key exchange algorithms & ciphers are accepted.
+  Use with caution!

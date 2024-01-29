@@ -1,0 +1,37 @@
+- name: Configure OpenSSH
+  hosts: all
+  become: true
+  tasks:
+    - name: Install openssh-server
+      ansible.builtin.apt:
+        update_cache: true
+        name: openssh-server
+
+    - name: Remove Diffie-Hellman moduli with less than 3071 bits
+      ansible.builtin.shell:
+        chdir: /etc/ssh/
+        creates: /etc/ssh/moduli.bak
+        cmd: |
+          cp moduli moduli.bak
+          awk '$5 >= 3071' moduli > moduli.safe
+          mv moduli.safe moduli
+
+    - name: Regenerate EdDSA host key
+      ansible.builtin.shell:
+        chdir: /etc/ssh/
+        creates: /etc/ssh/ssh_host_ed25519_key
+        cmd: ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N ""
+
+    - name: Create /etc/ssh/sshd_config
+      ansible.builtin.copy:
+        src: files/openssh-daemon/sshd_config
+        dest: /etc/ssh/sshd_config
+        owner: root
+        group: root
+        mode: '644'
+
+    - name: Restart OpenSSH daemon
+      ansible.builtin.systemd_service:
+        name: sshd
+        enabled: true
+        state: restarted
